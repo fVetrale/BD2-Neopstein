@@ -1,1 +1,44 @@
-# Neopstein
+# BD2-Neopstein (Epstein Files Graph Mapping)
+
+## 📌 Contesto del Progetto
+Il progetto **BD2-Neopstein** ha come obiettivo la creazione di una rappresentazione a grafo delle email del caso **Epstein** al fine di renderle interattive e facilmente navigabili. 
+Partendo da un dataset già a nostra disposizione (in formato `.parquet`), il nostro compito è concentrato sull'estrazione dei dati, la loro eventuale trasformazione e la **mappatura definitiva all'interno di un database a grafo tramite Neo4j**.
+
+L'utilizzo di un database a grafo ci permette di:
+- Analizzare dinamicamente le reti di comunicazione e le connessioni tra le diverse identità (mittenti, destinatari, nodi cc/bcc).
+- Rendere interrogabili volumi complessi di dati tramite query Cypher.
+- Esplorare in modo visivo e analitico chi ha comunicato con chi.
+
+## 🛠️ Stack Tecnologico
+- **Linguaggio**: Python (per estrazione dal `.parquet` e logica di caricamento).
+- **Database**: Neo4j (con linguaggio Cypher per le interrogazioni).
+- **Ambiente**: Docker Compose (per istanziare e gestire rapidamente il database locale).
+
+## 📂 Struttura del Progetto
+Di seguito l'alberatura delle directory principali del progetto:
+
+```text
+BD2-Neopstein/
+├── data/
+│   ├── raw/                  # Dataset originale (es. file .parquet) - NON COMMITTATO
+│   ├── processed/            # File CSV puliti e pronti per l'import in Neo4j
+│   └── ml_output/            # Eventuali output analitici
+├── docs/                     # Diagrammi concettuali (ER, Graph Schema) e documentazione
+├── notebooks/                # Notebook Jupyter per esplorazione dati e prototipazione
+├── scripts/
+│   └── run_import.sh         # Script Bash per automatizzare i processi di ETL e import
+├── src/                      # Codice sorgente principale
+│   ├── cli.py                # Entrypoint principale da riga di comando
+│   ├── config.py             # Configurazione e variabili d'ambiente (dal file .env)
+│   ├── db.py                 # Connettore e wrapper per le sessioni verso Neo4j
+│   ├── schema.py             # Configurazione di constraint e indici del grafo
+│   ├── etl/                  # Logiche di Extract, Transform, Load
+│   │   ├── build_csv.py      # Script per la creazione dei nodi/relazioni
+│   │   ├── clean_data.py     # Script di pulizia dati
+│   │   └── import_data.py    # Script per caricamento su Neo4j
+│   └── queries/              # Raccolta delle query Cypher pronte all'uso
+├── tests/                    # Moduli di test per importazione e query
+├── docker-compose.yml        # Configurazione del container Neo4j
+├── requirements.txt          # Dipendenze Python
+└── CLAUDE.md                 # Contesto e linee guida per LLM e Agent
+```
