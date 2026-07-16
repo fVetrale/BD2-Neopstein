@@ -5,9 +5,9 @@ Questo documento funge da contesto e linea guida per automatizzare la compilazio
 ---
 
 ## ⚙️ Variabili Globali (Da modificare con i valori reali)
-- **TEAM_ID**: `<INSERISCI_TEAM_ID>`
-- **USER_FILIPPO_ID**: `<INSERISCI_ID_FILIPPO>`
-- **USER_JOSE_ID**: `<INSERISCI_ID_JOSE>`
+- **TEAM_ID**: `<Neopstein>`
+- **USER_FILIPPO_ID**: `<fVetrale>`
+- **USER_JOSE_ID**: `<jose-sgariglia>`
 
 *Nota: Modifica queste variabili una volta che i vostri codici identificativi definitivi sono noti.*
 
