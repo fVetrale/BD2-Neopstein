@@ -12,7 +12,41 @@ L'utilizzo di un database a grafo ci permette di:
 ## 🛠️ Stack Tecnologico
 - **Linguaggio**: Python (per estrazione dal `.parquet` e logica di caricamento).
 - **Database**: Neo4j (con linguaggio Cypher per le interrogazioni).
-- **Ambiente**: Docker Compose (per istanziare e gestire rapidamente il database locale).
+- **API**: FastAPI + Pydantic (query e CRUD sul grafo via REST).
+- **Ambiente**: Docker Compose (per istanziare e gestire rapidamente Neo4j e l'API).
+
+## 🚀 Setup del Progetto
+
+### Prerequisiti
+- Docker e Docker Compose
+
+### 1. Configurazione ambiente
+```bash
+cp .env.example .env
+```
+Modifica `NEO4J_PASSWORD`/`NEO4J_AUTH` in `.env` se vuoi una password diversa da quella di default. Lascia `NEO4J_URI=bolt://neo4j:7687`: è il nome del servizio Docker, non `localhost`, perché l'API gira in un container separato da Neo4j.
+
+### 2. Avvio dei servizi
+```bash
+docker compose up -d --build
+```
+Avvia due container:
+- `neo4j`: Neo4j Browser su `http://localhost:7474`, Bolt su `bolt://localhost:7687`
+- `api`: FastAPI su `http://localhost:8000`
+
+### 3. Verifica che tutto funzioni
+```bash
+curl http://localhost:8000/health
+# {"status":"ok"}
+```
+In alternativa, apri `http://localhost:7474` nel browser ed effettua il login con `NEO4J_USER`/`NEO4J_PASSWORD`.
+
+### 4. Pipeline ETL + import
+Con i servizi attivi ed il dataset `.parquet` in `data/raw/`:
+```bash
+./scripts/run_import.sh
+```
+Esegue in sequenza ETL, creazione di constraint/indici e import in Neo4j; si interrompe con exit code non zero al primo stadio che fallisce.
 
 ## 📂 Struttura del Progetto
 Di seguito l'alberatura delle directory principali del progetto:
@@ -36,9 +70,13 @@ BD2-Neopstein/
 │   │   ├── build_csv.py      # Script per la creazione dei nodi/relazioni
 │   │   ├── clean_data.py     # Script di pulizia dati
 │   │   └── import_data.py    # Script per caricamento su Neo4j
+│   ├── crud/                 # Operazioni CRUD sul grafo (usate da CLI, test e API)
+│   ├── api/                  # Layer FastAPI (main.py, deps.py, routers/, schemas/)
 │   └── queries/              # Raccolta delle query Cypher pronte all'uso
 ├── tests/                    # Moduli di test per importazione e query
-├── docker-compose.yml        # Configurazione del container Neo4j
+├── docker-compose.yml        # Configurazione dei container Neo4j e API
+├── Dockerfile                # Immagine del servizio API
+├── .env.example              # Template delle variabili d'ambiente
 ├── requirements.txt          # Dipendenze Python
 └── CLAUDE.md                 # Contesto e linee guida per LLM e Agent
 ```
