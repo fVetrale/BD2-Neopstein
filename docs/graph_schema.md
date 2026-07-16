@@ -90,7 +90,4 @@ messaggio nel thread (`message_index` nel dataset) diventa la proprietà
 `position` della relazione `PART_OF`, non un attributo di `Mail`, perché è
 significativa solo nel contesto di un thread specifico.
 
-## Stato
 
-Schema in attesa di validazione/discussione col resto del gruppo (vedi
-Done-when issue #2).
