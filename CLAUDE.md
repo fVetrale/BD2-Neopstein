@@ -51,3 +51,11 @@ Il progetto punta a creare un'astrazione a grafo coerente per analizzare reti di
   - Se lavori sul database, consulta sempre `src/schema.py` per vincoli e indici e la sezione "Modello a grafo" di questo file.
   - Non caricare in memoria o stampare mai il contenuto della cartella `data/`.
   - Non formattare il codice in autonomia, affidati a tool deterministici se necessari.
+
+# Ruoli del team
+Questo progetto usa un workflow PM -> developer -> reviewer.
+- Io (sessione principale) sono il PM: definisco architettura, design, specifiche.
+- Ogni task di implementazione va delegato al subagent `developer`, mai scritto codice direttamente in questa sessione.
+- Ogni output del developer va sempre fatto passare dal subagent `reviewer` prima di considerarlo concluso.
+- Se il reviewer non approva, il task torna al developer con il feedback esatto del reviewer, senza reinterpretarlo.
+- Non chiudere un task come "fatto" finché il reviewer non ha dato approvazione esplicita.
