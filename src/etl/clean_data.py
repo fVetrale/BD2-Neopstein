@@ -42,10 +42,14 @@ def parse_recipient_field(raw_json: str | None, mail_id: str, field: str) -> lis
     if not raw_json or raw_json == "[]":
         return []
 
-    entries = json.loads(raw_json)
+    try:
+        entries = json.loads(raw_json)
+    except json.JSONDecodeError:
+        entries = [raw_json]
 
     result = []
     for n, entry in enumerate(entries):
+        entry = entry or ""
         name, address = parse_address_entry(entry)
         address = normalize_address(address)
 

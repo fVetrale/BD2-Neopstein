@@ -113,3 +113,45 @@ def test_parse_recipient_field_same_index_different_field_no_collision():
     to_result = parse_recipient_field(raw_to, "mail-7", "to")
     cc_result = parse_recipient_field(raw_cc, "mail-7", "cc")
     assert to_result[0]["address"] != cc_result[0]["address"]
+
+
+def test_parse_recipient_field_bare_string_with_name_not_json_array():
+    raw = "Jeffrey Epstein <jeeproject@yahoo.com>"
+    result = parse_recipient_field(raw, "mail-8", "sender")
+    assert result == [
+        {
+            "name": "Jeffrey Epstein",
+            "address": "jeeproject@yahoo.com",
+            "domain": "yahoo.com",
+            "is_redacted": False,
+        }
+    ]
+
+
+def test_parse_recipient_field_bare_string_address_only_not_json_array():
+    raw = "jeeproject@yahoo.com"
+    result = parse_recipient_field(raw, "mail-9", "sender")
+    assert result == [
+        {
+            "name": None,
+            "address": "jeeproject@yahoo.com",
+            "domain": "yahoo.com",
+            "is_redacted": False,
+        }
+    ]
+
+
+def test_parse_recipient_field_null_element_inside_valid_json_array():
+    raw = json.dumps(
+        [
+            "Alice One <alice@example.com>",
+            None,
+            "bob@example.org",
+        ]
+    )
+    result = parse_recipient_field(raw, "mail-10", "cc")
+    assert result == [
+        {"name": "Alice One", "address": "alice@example.com", "domain": "example.com", "is_redacted": False},
+        {"name": None, "address": "redacted:mail-10:cc:1", "domain": None, "is_redacted": True},
+        {"name": None, "address": "bob@example.org", "domain": "example.org", "is_redacted": False},
+    ]
