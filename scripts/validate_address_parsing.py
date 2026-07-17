@@ -25,6 +25,12 @@ def main() -> None:
     ids = table.column("id").to_pylist()
 
     field_columns = ["sender", "to_recipients", "cc_recipients", "bcc_recipients"]
+    field_names = {
+        "sender": "sender",
+        "to_recipients": "to",
+        "cc_recipients": "cc",
+        "bcc_recipients": "bcc",
+    }
 
     total_rows = len(ids)
     total_entries = 0
@@ -35,7 +41,7 @@ def main() -> None:
         raw_values = table.column(field).to_pylist()
         for mail_id, raw in zip(ids, raw_values):
             try:
-                entries = parse_recipient_field(raw, mail_id)
+                entries = parse_recipient_field(raw, mail_id, field_names[field])
             except Exception:
                 errors += 1
                 continue

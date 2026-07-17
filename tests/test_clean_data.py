@@ -54,7 +54,7 @@ def test_parse_recipient_field_multiple_valid_entries():
             "Bob Two <bob@example.org>",
         ]
     )
-    result = parse_recipient_field(raw, "mail-1")
+    result = parse_recipient_field(raw, "mail-1", "to")
     assert result == [
         {"name": "Alice One", "address": "alice@example.com", "domain": "example.com", "is_redacted": False},
         {"name": "Bob Two", "address": "bob@example.org", "domain": "example.org", "is_redacted": False},
@@ -63,7 +63,7 @@ def test_parse_recipient_field_multiple_valid_entries():
 
 def test_parse_recipient_field_only_address_entries():
     raw = json.dumps(["carol@example.com", "<dave@example.com>"])
-    result = parse_recipient_field(raw, "mail-2")
+    result = parse_recipient_field(raw, "mail-2", "to")
     assert result == [
         {"name": None, "address": "carol@example.com", "domain": "example.com", "is_redacted": False},
         {"name": None, "address": "dave@example.com", "domain": "example.com", "is_redacted": False},
@@ -72,23 +72,23 @@ def test_parse_recipient_field_only_address_entries():
 
 def test_parse_recipient_field_inverted_name():
     raw = json.dumps(["Epstein Jeffrey <jeffrey@example.com>"])
-    result = parse_recipient_field(raw, "mail-3")
+    result = parse_recipient_field(raw, "mail-3", "to")
     assert result[0]["name"] == "Epstein Jeffrey"
     assert result[0]["address"] == "jeffrey@example.com"
 
 
 def test_parse_recipient_field_fully_redacted_entry():
     raw = json.dumps(["REDACTED"])
-    result = parse_recipient_field(raw, "mail-4")
+    result = parse_recipient_field(raw, "mail-4", "to")
     assert result == [
-        {"name": None, "address": "redacted:mail-4:0", "domain": None, "is_redacted": True}
+        {"name": None, "address": "redacted:mail-4:to:0", "domain": None, "is_redacted": True}
     ]
 
 
 def test_parse_recipient_field_empty_variants():
-    assert parse_recipient_field(None, "mail-5") == []
-    assert parse_recipient_field("", "mail-5") == []
-    assert parse_recipient_field("[]", "mail-5") == []
+    assert parse_recipient_field(None, "mail-5", "to") == []
+    assert parse_recipient_field("", "mail-5", "to") == []
+    assert parse_recipient_field("[]", "mail-5", "to") == []
 
 
 def test_parse_recipient_field_mixed_valid_and_redacted():
@@ -99,9 +99,17 @@ def test_parse_recipient_field_mixed_valid_and_redacted():
             "bob@example.org",
         ]
     )
-    result = parse_recipient_field(raw, "mail-6")
+    result = parse_recipient_field(raw, "mail-6", "to")
     assert result == [
         {"name": "Alice One", "address": "alice@example.com", "domain": "example.com", "is_redacted": False},
-        {"name": "REDACTED NAME", "address": "redacted:mail-6:1", "domain": None, "is_redacted": True},
+        {"name": "REDACTED NAME", "address": "redacted:mail-6:to:1", "domain": None, "is_redacted": True},
         {"name": None, "address": "bob@example.org", "domain": "example.org", "is_redacted": False},
     ]
+
+
+def test_parse_recipient_field_same_index_different_field_no_collision():
+    raw_to = json.dumps(["REDACTED"])
+    raw_cc = json.dumps(["REDACTED"])
+    to_result = parse_recipient_field(raw_to, "mail-7", "to")
+    cc_result = parse_recipient_field(raw_cc, "mail-7", "cc")
+    assert to_result[0]["address"] != cc_result[0]["address"]

@@ -38,7 +38,7 @@ def is_redacted_address(address: str) -> bool:
     return "@" not in address
 
 
-def parse_recipient_field(raw_json: str | None, mail_id: str) -> list[dict]:
+def parse_recipient_field(raw_json: str | None, mail_id: str, field: str) -> list[dict]:
     if not raw_json or raw_json == "[]":
         return []
 
@@ -53,7 +53,7 @@ def parse_recipient_field(raw_json: str | None, mail_id: str) -> list[dict]:
             result.append(
                 {
                     "name": name,
-                    "address": f"redacted:{mail_id}:{n}",
+                    "address": f"redacted:{mail_id}:{field}:{n}",
                     "domain": None,
                     "is_redacted": True,
                 }
