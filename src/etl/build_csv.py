@@ -4,7 +4,7 @@ Legge il parquet con pyarrow (niente pandas, vedi CLAUDE.md), fa parsing
 riga per riga con `clean_data.parse_recipient_field`, risolve le identità
 Person con `entity_resolution.resolve_persons` (una sola volta su tutto il
 dataset, dopo aver raccolto tutte le menzioni) e scrive i CSV per nodi e
-relazioni in `data/processed/graph/`.
+relazioni in `data/processed/csv/`.
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from src.etl.clean_data import parse_recipient_field
 logger = logging.getLogger(__name__)
 
 DEFAULT_PARQUET_PATH = Path("data/raw/jmail_emails_clustered_sample_thread_aware.parquet")
-DEFAULT_OUTPUT_DIR = Path("data/processed/graph")
+DEFAULT_OUTPUT_DIR = Path("data/processed/csv")
 
 _RECIPIENT_FIELDS = ("to", "cc", "bcc")
 _BATCH_SIZE = 10_000
