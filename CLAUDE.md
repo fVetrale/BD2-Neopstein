@@ -4,7 +4,7 @@ Vedi `@README.md` per una panoramica generale (quando sarà compilato).
 
 ## WHAT (Struttura e Stack)
 - **Scopo**: Pipeline in tre fasi: ETL da file `.parquet` (email) → CSV per entità → importazione in Neo4j → API REST (FastAPI) che espone query e operazioni CRUD sul grafo.
-- **Tech Stack**: Python, Neo4j (Cypher), FastAPI + Pydantic, Docker Compose. LLM locale (llama3.1, es. via Ollama) usato SOLO come fallback in fase ETL (vedi Regole ETL).
+- **Tech Stack**: Python, Neo4j (Cypher), FastAPI + Pydantic, Docker Compose.
 - **Architettura Principale**:
   - `src/cli.py`: Entrypoint principale da riga di comando
   - `src/etl/`: Pulizia dati (`clean_data.py`), generazione CSV (`build_csv.py`), importazione in Neo4j (`import_data.py`)
@@ -35,7 +35,7 @@ Vedi `@README.md` per una panoramica generale (quando sarà compilato).
 - I campi `sender`, `to_recipients`, `cc_recipients`, `bcc_recipients` sono array JSON di stringhe nel formato `"Nome <indirizzo>"` o `"<indirizzo>"`. Il parsing è DETERMINISTICO: `json.loads` + regex. Mai usare l'LLM per estrarre indirizzi.
 - Voci di destinatario completamente REDACTED: creare un nodo `EmailAddress` sintetico (es. `redacted:<mail_id>:<n>`) con `is_redacted = true`. Non scartare mai la relazione.
 - Il campo cluster contiene sia l'id numerico sia il nome: separarli in ETL in `cluster_id` (int) e `label` (string).
-- Il nodo `Person` nasce da entity resolution sui display name (es. "Jeffrey Epstein" ≡ "J. Epstein" ≡ "Epstein Jeffrey"). Prima regole deterministiche (normalizzazione, confronto cognome+iniziale, indirizzi condivisi); l'LLM locale è SOLO il fallback per i casi ambigui. Ogni output LLM va cachato su file (`data/ml_output/`) così i run sono ripetibili e l'LLM non viene reinterrogato.
+- Il nodo `Person` nasce da entity resolution sui display name (es. "Jeffrey Epstein" ≡ "J. Epstein" ≡ "Epstein Jeffrey"), basata SOLO su regole deterministiche (normalizzazione, confronto cognome+iniziale, indirizzi condivisi); i gruppi residui ambigui che le regole non riescono a fondere restano `Person` distinte, senza alcuna adjudication automatica.
 - Se un display name non è ricavabile, l'`EmailAddress` esiste comunque; `Person` si crea solo con un nome, altrimenti flag `is_unknown`.
 - L'import è idempotente: sempre `MERGE` sulle chiavi, mai `CREATE` puro sui nodi. Constraint e indici (`src/schema.py`) vanno applicati PRIMA di ogni import.
 
