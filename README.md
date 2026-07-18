@@ -63,6 +63,33 @@ Esempio:
 NEO4J_URI=bolt://localhost:7687 NEO4J_USER=neo4j NEO4J_PASSWORD=changeme python -m src.queries.cluster --cluster-id 52
 ```
 
+## Endpoint API
+
+Ogni endpoint elenco (lista) accetta i query param `limit` (default `50`, tra `1` e `500`) e `offset` (default `0`) per la paginazione. `GET /mails/{mail_id}` ritorna un oggetto singolo e non è paginato.
+
+| Metodo | Path | Query di riferimento | Descrizione |
+|---|---|---|---|
+| GET | `/clusters/{cluster_id}/mails` | `get_cluster_mails` | Mail appartenenti al cluster, con `probability` della relazione `BELONGS_TO` |
+| GET | `/clusters/{cluster_id}/persons` | `get_cluster_persons` | Persone coinvolte (mittenti/destinatari) nelle mail del cluster |
+| GET | `/clusters/top-redacted` | `get_top_redacted_clusters` | Classifica dei cluster per redazioni totali, ordinata decrescente |
+| GET | `/persons/{person_id}/mails` | `get_person_mails` | Mail inviate o ricevute dalla persona |
+| GET | `/persons/{person_id}/connected` | `get_connected_persons` | Persone connesse via scambio di email |
+| GET | `/persons/{person_id}/addresses` | `get_person_addresses` | Indirizzi email posseduti dalla persona |
+| GET | `/mails/{mail_id}` | `get_mail_info` | Dettaglio di una mail (404 se non esiste) |
+| GET | `/mails/{mail_id}/persons` | `get_mail_persons` | Persone collegate alla mail con relativo ruolo (sender/to/cc/bcc) |
+
+Esempi (con i servizi Docker attivi):
+```bash
+curl "http://localhost:8000/clusters/52/mails?limit=2"
+curl "http://localhost:8000/clusters/52/persons"
+curl "http://localhost:8000/clusters/top-redacted?limit=3"
+curl "http://localhost:8000/persons/atci3/mails"
+curl "http://localhost:8000/persons/atci3/connected"
+curl "http://localhost:8000/persons/atci3/addresses"
+curl "http://localhost:8000/mails/001612df62eb14194162f0a366793927"
+curl "http://localhost:8000/mails/001612df62eb14194162f0a366793927/persons"
+```
+
 ## 📂 Struttura del Progetto
 Di seguito l'alberatura delle directory principali del progetto:
 
