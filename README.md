@@ -77,6 +77,17 @@ Ogni endpoint elenco (lista) accetta i query param `limit` (default `50`, tra `1
 | GET | `/persons/{person_id}/addresses` | `get_person_addresses` | Indirizzi email posseduti dalla persona |
 | GET | `/mails/{mail_id}` | `get_mail_info` | Dettaglio di una mail (404 se non esiste) |
 | GET | `/mails/{mail_id}/persons` | `get_mail_persons` | Persone collegate alla mail con relativo ruolo (sender/to/cc/bcc) |
+| POST | `/clusters` | `create_cluster` | Crea un nuovo cluster (409 se `cluster_id` esiste già) |
+| GET | `/clusters/{cluster_id}` | `get_cluster` | Dettaglio di un cluster (404 se non esiste) |
+| PUT | `/clusters/{cluster_id}` | `update_cluster` | Aggiorna la `label` di un cluster (404 se non esiste) |
+| DELETE | `/clusters/{cluster_id}` | `delete_cluster` | Elimina un cluster (404 se non esiste) |
+| POST | `/persons` | `create_person` | Crea una nuova persona (409 se `person_id` esiste già) |
+| GET | `/persons/{person_id}` | `get_person` | Dettaglio di una persona (404 se non esiste) |
+| PUT | `/persons/{person_id}` | `update_person` | Aggiorna le proprietà di una persona (404 se non esiste) |
+| DELETE | `/persons/{person_id}` | `delete_person` | Elimina una persona (404 se non esiste) |
+| POST | `/mails` | `create_mail` | Crea una nuova mail (409 se `id` esiste già) |
+| PUT | `/mails/{mail_id}` | `update_mail` | Aggiorna le proprietà di una mail (404 se non esiste) |
+| DELETE | `/mails/{mail_id}` | `delete_mail` | Elimina una mail (404 se non esiste) |
 
 Esempi (con i servizi Docker attivi):
 ```bash
@@ -89,6 +100,14 @@ curl "http://localhost:8000/persons/atci3/addresses"
 curl "http://localhost:8000/mails/001612df62eb14194162f0a366793927"
 curl "http://localhost:8000/mails/001612df62eb14194162f0a366793927/persons"
 ```
+
+## Documentazione interattiva e collection Postman
+
+| Risorsa | Percorso | Note |
+|---|---|---|
+| Swagger UI | `http://localhost:8000/docs` | Disponibile con i servizi Docker attivi |
+| ReDoc | `http://localhost:8000/redoc` | Disponibile con i servizi Docker attivi |
+| Postman Collection | `notebooks/postman_collection.json` | Import → File → seleziona il file; imposta la variabile di collection `base_url` se il servizio non gira su `http://localhost:8000` |
 
 ## 📂 Struttura del Progetto
 Di seguito l'alberatura delle directory principali del progetto:

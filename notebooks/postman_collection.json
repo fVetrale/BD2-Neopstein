@@ -1,0 +1,243 @@
+{
+  "info": {
+    "name": "BD2-Neopstein API",
+    "description": "Collection di richieste per l'API REST BD2-Neopstein: endpoint di analisi e CRUD sul grafo email del caso Epstein (Person, Mail, Cluster).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Cluster",
+      "item": [
+        {
+          "name": "Mail di un cluster",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/clusters/1/mails",
+            "description": "Restituisce le mail appartenenti al cluster con id 1."
+          }
+        },
+        {
+          "name": "Persone di un cluster",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/clusters/1/persons",
+            "description": "Restituisce le persone coinvolte nelle mail del cluster con id 1."
+          }
+        },
+        {
+          "name": "Classifica cluster per redazioni",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/clusters/top-redacted",
+            "description": "Restituisce i cluster ordinati per numero totale di redazioni."
+          }
+        },
+        {
+          "name": "Crea un cluster",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/clusters",
+            "description": "Crea un nuovo nodo Cluster.",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"cluster_id\": 1,\n  \"label\": \"Finance\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Dettaglio di un cluster",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/clusters/1",
+            "description": "Restituisce le proprietà del cluster con id 1."
+          }
+        },
+        {
+          "name": "Aggiorna un cluster",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/clusters/1",
+            "description": "Aggiorna la label del cluster con id 1.",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"label\": \"Finance Updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Elimina un cluster",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/clusters/1",
+            "description": "Elimina il cluster con id 1."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Person",
+      "item": [
+        {
+          "name": "Mail di una persona",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/persons/atci3/mails",
+            "description": "Restituisce le mail inviate o ricevute dalla persona atci3."
+          }
+        },
+        {
+          "name": "Persone connesse",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/persons/atci3/connected",
+            "description": "Restituisce le persone connesse alla persona atci3 via scambio di email."
+          }
+        },
+        {
+          "name": "Indirizzi email di una persona",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/persons/atci3/addresses",
+            "description": "Restituisce gli indirizzi email posseduti dalla persona atci3."
+          }
+        },
+        {
+          "name": "Crea una persona",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/persons",
+            "description": "Crea un nuovo nodo Person.",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"person_id\": \"atci3\",\n  \"display_name\": \"Jeffrey Epstein\",\n  \"is_unknown\": false,\n  \"is_epstein\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Dettaglio di una persona",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/persons/atci3",
+            "description": "Restituisce le proprietà della persona atci3."
+          }
+        },
+        {
+          "name": "Aggiorna una persona",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/persons/atci3",
+            "description": "Aggiorna le proprietà della persona atci3.",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"display_name\": \"J. Epstein\",\n  \"is_unknown\": false,\n  \"is_epstein\": true\n}"
+            }
+          }
+        },
+        {
+          "name": "Elimina una persona",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/persons/atci3",
+            "description": "Elimina la persona atci3."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mail",
+      "item": [
+        {
+          "name": "Dettaglio di una mail",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/mails/001612df62eb14194162f0a366793927",
+            "description": "Restituisce le proprietà della mail indicata, con eventuale cluster di appartenenza."
+          }
+        },
+        {
+          "name": "Persone collegate a una mail",
+          "request": {
+            "method": "GET",
+            "url": "{{base_url}}/mails/001612df62eb14194162f0a366793927/persons",
+            "description": "Restituisce le persone collegate alla mail con relativo ruolo."
+          }
+        },
+        {
+          "name": "Crea una mail",
+          "request": {
+            "method": "POST",
+            "url": "{{base_url}}/mails",
+            "description": "Crea un nuovo nodo Mail.",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"001612df62eb14194162f0a366793927\",\n  \"subject\": \"Meeting notes\",\n  \"body\": \"See attached.\",\n  \"sent_at\": \"2015-03-04T10:00:00\",\n  \"redaction_count\": 0,\n  \"redaction_ratio\": 0.0,\n  \"attachment_count\": 1,\n  \"is_promotional\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Aggiorna una mail",
+          "request": {
+            "method": "PUT",
+            "url": "{{base_url}}/mails/001612df62eb14194162f0a366793927",
+            "description": "Aggiorna le proprietà della mail indicata.",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"subject\": \"Meeting notes (updated)\",\n  \"is_promotional\": false\n}"
+            }
+          }
+        },
+        {
+          "name": "Elimina una mail",
+          "request": {
+            "method": "DELETE",
+            "url": "{{base_url}}/mails/001612df62eb14194162f0a366793927",
+            "description": "Elimina la mail indicata."
+          }
+        }
+      ]
+    }
+  ]
+}
