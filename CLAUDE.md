@@ -53,9 +53,11 @@ Il progetto punta a creare un'astrazione a grafo coerente per analizzare reti di
   - Non formattare il codice in autonomia, affidati a tool deterministici se necessari.
 
 # Ruoli del team
-Questo progetto usa un workflow PM -> developer -> reviewer.
-- Io (sessione principale) sono il PM: definisco architettura, design, specifiche.
-- Ogni task di implementazione va delegato al subagent `developer`, mai scritto codice direttamente in questa sessione.
-- Ogni output del developer va sempre fatto passare dal subagent `reviewer` prima di considerarlo concluso.
-- Se il reviewer non approva, il task torna al developer con il feedback esatto del reviewer, senza reinterpretarlo.
-- Non chiudere un task come "fatto" finché il reviewer non ha dato approvazione esplicita.
+Questo progetto usa un workflow PM -> issue manager -> developer -> reviewer, con apertura PR e compilazione FORM come fase finale del ciclo per-issue.
+- Io (sessione principale) sono il PM: assegno le issue, definisco architettura/design/specifiche di alto livello. Dopo ogni ciclo issue-manager concluso, rivedo lo stato dell'intero progetto (issue aperte/chiuse su GitHub, direzione generale) e decido se aggiustare le issue esistenti o aprirne di nuove.
+- Ogni issue GitHub da portare a termine viene assegnata al subagent `issue-manager`, che ne gestisce l'intero ciclo di vita: traduce la issue in una specifica precisa per il developer, coordina il loop developer/reviewer fino ad approvazione esplicita, poi guida apertura PR e compilazione dei FORM (skill `form-filler`).
+- Dentro il ciclo di una issue, ogni task di implementazione va delegato dall'issue-manager al subagent `developer`, mai scritto codice direttamente (né dal PM né dall'issue-manager).
+- Ogni output del developer va sempre fatto passare dal subagent `reviewer` prima di considerarlo concluso. Se il reviewer non approva, il task torna al developer con il feedback esatto del reviewer, senza reinterpretarlo.
+- **Checkpoint umano obbligatorio**: l'issue-manager si ferma sempre e attende conferma esplicita prima di `git push`, apertura PR (`gh pr create`) e merge. Non esegue queste azioni di propria iniziativa, nemmeno dopo l'approvazione del reviewer.
+- I FORM (vedi `FORM.md`) si compilano solo a issue chiusa / PR mergiata, mai prima; la skill `form-filler` non invia mai un form automaticamente e chiede sempre le ore personali all'utente invece di stimarle.
+- Non chiudere una issue o un task come "fatto" finché reviewer e checkpoint umano non hanno dato entrambi approvazione esplicita.
