@@ -48,6 +48,42 @@ Con i servizi attivi ed il dataset `.parquet` in `data/raw/`:
 ```
 Esegue in sequenza ETL, creazione di constraint/indici e import in Neo4j; si interrompe con exit code non zero al primo stadio che fallisce.
 
+### Query su Cluster
+`src/queries/cluster.py` espone tre query Python riutilizzabili per interrogare i `Cluster` del grafo: le mail appartenenti a un cluster, le persone coinvolte in un cluster e i cluster con più email redatte.
+
+Con i servizi attivi e i dati importati, esegui:
+```bash
+python -m src.queries.cluster
+```
+Usa le stesse env var del resto del progetto (`.env`) per la connessione a Neo4j: se lo esegui dall'host verso il container Docker esposto, l'URI è `bolt://localhost:7687`; se lo esegui dentro un container della rete Docker, è `bolt://neo4j:7687`. Sono disponibili anche i flag opzionali `--cluster-id` (default: il primo cluster trovato nel DB) e `--limit` (default: 10).
+
+Esempio di output:
+```
+$ python -m src.queries.cluster
+--- Mail del cluster 52 ---
+[{'id': 'EFTA01998334-0',
+  'probability': 1.0,
+  'redaction_count': 2,
+  'sent_at': '2012-07-31T01:45:11+00:00',
+  'subject': 'Barbro Ehnbom'},
+ ... (altre mail del cluster omesse per brevità) ...]
+--- Persone coinvolte nel cluster 52 ---
+[{'display_name': 'jeffrey E.', 'is_epstein': True, 'is_unknown': False, 'person_id': 'jeffrey e'},
+ {'display_name': 'Sarah', 'is_epstein': False, 'is_unknown': False, 'person_id': 'sarah'},
+ {'display_name': 'Cecilia Steen', 'is_epstein': False, 'is_unknown': False, 'person_id': 'cecilia steen'}]
+--- Top 10 cluster per redazioni totali ---
+[{'cluster_id': 43, 'label': 'Epstein Case', 'total_redactions': 4635},
+ {'cluster_id': 135, 'label': 'Private Matters', 'total_redactions': 4455},
+ {'cluster_id': 222, 'label': 'Travel', 'total_redactions': 3625},
+ {'cluster_id': 219, 'label': 'Social Calendar', 'total_redactions': 2501},
+ {'cluster_id': 14, 'label': 'Reminders', 'total_redactions': 1610},
+ {'cluster_id': 203, 'label': 'Epstein', 'total_redactions': 1324},
+ {'cluster_id': 139, 'label': 'Personal Messages', 'total_redactions': 1303},
+ {'cluster_id': 252, 'label': 'Apartment Cleaning', 'total_redactions': 1172},
+ {'cluster_id': 265, 'label': 'Travel Arrangements', 'total_redactions': 884},
+ {'cluster_id': 124, 'label': 'Pedophile', 'total_redactions': 770}]
+```
+
 ## 📂 Struttura del Progetto
 Di seguito l'alberatura delle directory principali del progetto:
 
