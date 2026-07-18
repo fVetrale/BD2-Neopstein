@@ -48,6 +48,28 @@ Con i servizi attivi ed il dataset `.parquet` in `data/raw/`:
 ```
 Esegue in sequenza ETL, creazione di constraint/indici e import in Neo4j; si interrompe con exit code non zero al primo stadio che fallisce.
 
+### Query su Mail
+`src/queries/mail.py` espone due funzioni che, data una `neo4j.Session` e un `mail_id`, restituiscono strutture dati Python pronte all'uso (nessuna dipendenza da HTTP):
+- `get_mail_info(session, mail_id)`: proprietà della `Mail` (subject, sent_at, redaction, ecc.) più le info del `Cluster` collegato (`cluster_id`, `label`, `probability`), oppure `None` se la mail non esiste.
+- `get_mail_persons(session, mail_id)`: elenco delle `Person` collegate alla mail (mittente e destinatari), ciascuna con i ruoli in cui compare (`sender`, `to`, `cc`, `bcc`).
+
+Il modulo è eseguibile anche da riga di comando:
+```bash
+python -m src.queries.mail mail-000123
+```
+
+Esempio schematico di output:
+```text
+Info mail:
+{'id': 'mail-000123', 'subject': 'Re: incontro', 'sent_at': '2015-03-02T10:15:00', 'redaction_count': 0, 'redaction_ratio': 0.0, 'attachment_count': 1, 'is_promotional': False, 'cluster_id': 4, 'label': 'logistica-viaggi', 'probability': 0.87}
+Persone collegate:
+[{'person_id': 'p-001', 'display_name': 'Jeffrey Epstein', 'is_unknown': False, 'is_epstein': True, 'roles': ['sender']}, {'person_id': 'p-002', 'display_name': 'Ghislaine Maxwell', 'is_unknown': False, 'is_epstein': False, 'roles': ['cc', 'to']}]
+```
+Se la mail non è collegata a nessun `Cluster`, `cluster_id`, `label` e `probability` valgono `None`, ad esempio:
+```text
+{'id': 'mail-000123', 'subject': 'Promo newsletter', 'sent_at': '2015-01-10T08:00:00', 'redaction_count': 0, 'redaction_ratio': 0.0, 'attachment_count': 0, 'is_promotional': True, 'cluster_id': None, 'label': None, 'probability': None}
+```
+
 ## 📂 Struttura del Progetto
 Di seguito l'alberatura delle directory principali del progetto:
 
