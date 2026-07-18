@@ -2,6 +2,7 @@
 
 Uso: python -m src.cli etl
      python -m src.cli schema
+     python -m src.cli import
 """
 
 from __future__ import annotations
@@ -13,6 +14,7 @@ import os
 from neo4j import GraphDatabase
 
 from src.etl.build_csv import DEFAULT_OUTPUT_DIR, DEFAULT_PARQUET_PATH, build_graph_csvs
+from src.etl.import_data import run_import, verify_counts
 from src.schema import apply_schema_with_driver
 
 logger = logging.getLogger(__name__)
@@ -30,6 +32,8 @@ def main() -> None:
 
     subparsers.add_parser("schema", help="Applica constraint e indici Neo4j")
 
+    subparsers.add_parser("import", help="Importa i CSV in Neo4j (nodi, poi relazioni)")
+
     args = parser.parse_args()
 
     if args.command == "etl":
@@ -42,6 +46,22 @@ def main() -> None:
         try:
             apply_schema_with_driver(driver)
             logger.info("Constraint e indici applicati con successo")
+        finally:
+            driver.close()
+    elif args.command == "import":
+        driver = GraphDatabase.driver(
+            os.environ["NEO4J_URI"],
+            auth=(os.environ["NEO4J_USER"], os.environ["NEO4J_PASSWORD"]),
+        )
+        try:
+            counts = run_import(driver)
+            logger.info("Import completato: %s", counts)
+            verification = verify_counts(driver)
+            mismatches = {k: v for k, v in verification.items() if not v["match"]}
+            if mismatches:
+                logger.warning("Discrepanze rilevate nei conteggi: %s", mismatches)
+            else:
+                logger.info("Tutti i conteggi corrispondono ai CSV sorgente")
         finally:
             driver.close()
 
