@@ -48,6 +48,41 @@ Con i servizi attivi ed il dataset `.parquet` in `data/raw/`:
 ```
 Esegue in sequenza ETL, creazione di constraint/indici e import in Neo4j; si interrompe con exit code non zero al primo stadio che fallisce.
 
+## Query disponibili
+
+### Query su Person / EmailAddress
+Con i servizi attivi, esegui le query pronte all'uso in `src/queries/person.py` da riga di comando:
+```bash
+NEO4J_URI=bolt://localhost:7687 NEO4J_USER=neo4j NEO4J_PASSWORD=changeme python -m src.queries.person "daphne wallace"
+```
+Lo script esegue tre query per il `person_id` indicato:
+- `get_person_mails`: tutte le email inviate o ricevute (come destinatario TO/CC/BCC) dagli indirizzi posseduti dalla persona.
+- `get_person_addresses`: tutti gli indirizzi email posseduti dalla persona.
+- `get_connected_persons`: le altre persone connesse tramite scambio di email (anche solo tramite indirizzi redatti).
+
+Esempio (troncato) di output:
+```
+--- Mail per person_id='daphne wallace' (154) ---
+[
+  {
+    "id": "EFTA02221172-0",
+    "subject": "Re: Call List for JE-who is David Mapp?",
+    "sent_at": "2017-08-21T15:11:00+00:00"
+  },
+  ...
+]
+--- EmailAddress per person_id='daphne wallace' (92) ---
+[...]
+--- Person connesse a person_id='daphne wallace' (23) ---
+[
+  {
+    "person_id": "brandon hillin",
+    "display_name": "Brandon Hillin"
+  },
+  ...
+]
+```
+
 ## 📂 Struttura del Progetto
 Di seguito l'alberatura delle directory principali del progetto:
 
