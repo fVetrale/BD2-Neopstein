@@ -46,7 +46,13 @@ Con i servizi attivi ed il dataset `.parquet` in `data/raw/`:
 ```bash
 ./scripts/run_import.sh
 ```
-Esegue in sequenza ETL, creazione di constraint/indici e import in Neo4j; si interrompe con exit code non zero al primo stadio che fallisce.
+Esegue in sequenza ETL, creazione di constraint/indici e import in Neo4j; si interrompe con exit code non zero al primo stadio che fallisce. L'import è idempotente (`MERGE` sulle chiavi): eseguirlo più volte non duplica né corrompe i dati.
+
+Al termine, come passo opzionale di verifica, puoi confermare conteggi e integrità del grafo importato:
+```bash
+python -m src.cli validate
+```
+Confronta i conteggi Neo4j con i CSV sorgente e stampa un report testuale sulla cardinalità delle relazioni (es. percentuale di `Mail` senza `SENT` in ingresso o senza `BELONGS_TO` in uscita).
 
 ## Query disponibili
 
@@ -109,6 +115,13 @@ curl "http://localhost:8000/mails/001612df62eb14194162f0a366793927/persons"
 | ReDoc | `http://localhost:8000/redoc` | Disponibile con i servizi Docker attivi |
 | Postman Collection | `notebooks/postman_collection.json` | Import → File → seleziona il file; imposta la variabile di collection `base_url` se il servizio non gira su `http://localhost:8000` |
 
+## Documentazione
+
+| Documento | Percorso | Contenuto |
+|---|---|---|
+| Report finale | `docs/report.md` | Descrizione end-to-end del progetto: pipeline, modello a grafo, query, API |
+| Findings di validazione | `docs/validation_findings.md` | Esiti della validazione dei dati importati (conteggi, cardinalità, anomalie) |
+
 ## 📂 Struttura del Progetto
 Di seguito l'alberatura delle directory principali del progetto:
 
@@ -116,21 +129,21 @@ Di seguito l'alberatura delle directory principali del progetto:
 BD2-Neopstein/
 ├── data/
 │   ├── raw/                  # Dataset originale (es. file .parquet) - NON COMMITTATO
-│   ├── processed/            # File CSV puliti e pronti per l'import in Neo4j
-│   └── ml_output/            # Eventuali output analitici
-├── docs/                     # Diagrammi concettuali (ER, Graph Schema) e documentazione
-├── notebooks/                # Notebook Jupyter per esplorazione dati e prototipazione
+│   └── processed/            # File CSV puliti e pronti per l'import in Neo4j
+├── docs/                     # Diagrammi concettuali (ER, Graph Schema), report e documentazione
+├── notebooks/                # Notebook Jupyter e collection Postman
 ├── scripts/
-│   └── run_import.sh         # Script Bash per automatizzare i processi di ETL e import
-├── src/                      # Codice sorgente principale
-│   ├── cli.py                # Entrypoint principale da riga di comando
-│   ├── config.py             # Configurazione e variabili d'ambiente (dal file .env)
-│   ├── db.py                 # Connettore e wrapper per le sessioni verso Neo4j
-│   ├── schema.py             # Configurazione di constraint e indici del grafo
-│   ├── etl/                  # Logiche di Extract, Transform, Load
-│   │   ├── build_csv.py      # Script per la creazione dei nodi/relazioni
-│   │   ├── clean_data.py     # Script di pulizia dati
-│   │   └── import_data.py    # Script per caricamento su Neo4j
+│   ├── run_import.sh               # Script Bash per automatizzare i processi di ETL e import
+│   └── validate_address_parsing.py # Script di supporto per validare il parsing degli indirizzi
+├── src/                       # Codice sorgente principale
+│   ├── cli.py                    # Entrypoint principale da riga di comando
+│   ├── schema.py                 # Configurazione di constraint e indici del grafo
+│   ├── etl/                      # Logiche di Extract, Transform, Load
+│   │   ├── build_csv.py          # Script per la creazione dei nodi/relazioni
+│   │   ├── clean_data.py         # Script di pulizia dati
+│   │   ├── entity_resolution.py  # Entity resolution deterministica sui display name
+│   │   ├── import_data.py        # Script per caricamento su Neo4j
+│   │   └── validate_import.py    # Verifica conteggi e integrità post-import
 │   ├── crud/                 # Operazioni CRUD sul grafo (usate da CLI, test e API)
 │   ├── api/                  # Layer FastAPI (main.py, deps.py, routers/, schemas/)
 │   └── queries/              # Raccolta delle query Cypher pronte all'uso
